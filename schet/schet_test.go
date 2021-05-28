@@ -1,4 +1,4 @@
-package schetnumber_test
+package schet_test
 
 import (
 	"errors"
@@ -6,7 +6,7 @@ import (
 	"runtime"
 	"testing"
 
-	"github.com/bankschet/bankschet/schetnumber"
+	"github.com/bankschet/bankschet/schet"
 )
 
 func TestAccountType(t *testing.T) {
@@ -31,7 +31,7 @@ func TestAccountType(t *testing.T) {
 	for _, tc := range testCases {
 		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
-			number, err := schetnumber.New(tc.number)
+			number, err := schet.New(tc.number)
 
 			linkToToest := fmt.Sprintf("%s:%d", file, tc.line)
 
@@ -75,14 +75,14 @@ func TestAccountCurrency(t *testing.T) {
 			name:        "Не умеем открывать счета в беллоруских рублях",
 			number:      "40817906455556666666",
 			expected:    "",
-			expectedErr: schetnumber.ErrUnknownCurrency,
+			expectedErr: schet.ErrUnknownCurrency,
 		},
 	}
 
 	for _, tc := range testCases {
 		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
-			number, err := schetnumber.New(tc.number)
+			number, err := schet.New(tc.number)
 
 			linkToToest := fmt.Sprintf("%s:%d", file, tc.line)
 
@@ -133,14 +133,14 @@ func TestAccountTypeCode(t *testing.T) {
 			name:        "Неизвестный код для типа 00000",
 			number:      "00000810455556666666",
 			expected:    "",
-			expectedErr: schetnumber.ErrUnknownTypeCode,
+			expectedErr: schet.ErrUnknownTypeCode,
 		},
 	}
 
 	for _, tc := range testCases {
 		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
-			number, err := schetnumber.New(tc.number)
+			number, err := schet.New(tc.number)
 
 			linkToToest := fmt.Sprintf("%s:%d", file, tc.line)
 
