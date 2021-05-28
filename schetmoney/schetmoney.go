@@ -8,7 +8,7 @@ var Codes = map[string]string{
 	"978": "EUR",
 }
 
-var Nums = map[string]string{
+var Numerics = map[string]string{
 	"RUR": "810",
 	"RUB": "643",
 	"USD": "840",

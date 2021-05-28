@@ -9,19 +9,19 @@ import (
 )
 
 type Account struct {
-	Number       string
-	FirstType    string
-	SecondType   string
-	CurrencyCode string
-	TypeCode     string
-	CurrencyNum  string
+	Number          string
+	FirstType       string
+	SecondType      string
+	TypeCode        string
+	CurrencyCode    string
+	CurrencyNumeric string
 }
 
 var (
 	ErrInvalidLength         = errors.New("account number mast be 20 digits long")
 	ErrNumberContainsLetters = errors.New("account numbers mast contains only digits")
 	ErrUnknownCurrency       = errors.New("unknown currency")
-	ErrUnknownTypeCode       = errors.New("Unknown type code")
+	ErrUnknownTypeCode       = errors.New("unknown type code")
 )
 
 func New(number string) (Account, error) {
@@ -41,20 +41,20 @@ func New(number string) (Account, error) {
 		return Account{}, fmt.Errorf("unknown code for type %q: %w", firstType+secondType, ErrUnknownTypeCode)
 	}
 
-	currencyNum := number[5:8]
+	currencyNumeric := number[5:8]
 
-	currencyCode, ok := schetmoney.Codes[currencyNum]
+	currencyCode, ok := schetmoney.Codes[currencyNumeric]
 	if !ok {
-		return Account{}, fmt.Errorf("unexpected currency numeric code %q: %w", currencyNum, ErrUnknownCurrency)
+		return Account{}, fmt.Errorf("unexpected currency numeric code %q: %w", currencyNumeric, ErrUnknownCurrency)
 	}
 
 	return Account{
-		Number:       number,
-		FirstType:    firstType,
-		SecondType:   secondType,
-		TypeCode:     typeCode,
-		CurrencyNum:  currencyNum,
-		CurrencyCode: currencyCode,
+		Number:          number,
+		FirstType:       firstType,
+		SecondType:      secondType,
+		TypeCode:        typeCode,
+		CurrencyNumeric: currencyNumeric,
+		CurrencyCode:    currencyCode,
 	}, nil
 }
 
