@@ -33,29 +33,30 @@ func New(number string) (Account, error) {
 		return Account{}, ErrNumberContainsLetters
 	}
 
-	firstType := number[0:3]
-	secondType := number[3:5]
-
-	typeCode, ok := TypeCodes[firstType+secondType]
-	if !ok {
-		return Account{}, fmt.Errorf("unknown code for type %q: %w", firstType+secondType, ErrUnknownTypeCode)
+	account := Account{
+		Number:     number,
+		FirstType:  number[0:3],
+		SecondType: number[3:5],
 	}
 
-	currencyNumeric := number[5:8]
-
-	currencyCode, ok := schetmoney.Codes[currencyNumeric]
+	var ok bool
+	account.TypeCode, ok = TypeCodes[account.FirstType+account.SecondType]
 	if !ok {
-		return Account{}, fmt.Errorf("unexpected currency numeric code %q: %w", currencyNumeric, ErrUnknownCurrency)
+		return account, fmt.Errorf(
+			"unknown code for type %q: %w", account.FirstType+account.SecondType, ErrUnknownTypeCode,
+		)
 	}
 
-	return Account{
-		Number:          number,
-		FirstType:       firstType,
-		SecondType:      secondType,
-		TypeCode:        typeCode,
-		CurrencyNumeric: currencyNumeric,
-		CurrencyCode:    currencyCode,
-	}, nil
+	account.CurrencyNumeric = number[5:8]
+
+	account.CurrencyCode, ok = schetmoney.Codes[account.CurrencyNumeric]
+	if !ok {
+		return account, fmt.Errorf(
+			"unexpected currency numeric code %q: %w", account.CurrencyNumeric, ErrUnknownCurrency,
+		)
+	}
+
+	return account, nil
 }
 
 func (a Account) Type() string {
