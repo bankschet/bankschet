@@ -3,6 +3,7 @@ package schet_test
 import (
 	"errors"
 	"fmt"
+	"path/filepath"
 	"runtime"
 	"testing"
 
@@ -10,10 +11,8 @@ import (
 )
 
 func TestAccountType(t *testing.T) {
-	_, file, _, _ := runtime.Caller(0)
-
-	testCases := []struct {
-		line        int
+	tests := []struct {
+		line        string
 		name        string
 		number      string
 		expected    string
@@ -28,29 +27,25 @@ func TestAccountType(t *testing.T) {
 		},
 	}
 
-	for _, tc := range testCases {
-		tc := tc
-		t.Run(tc.name, func(t *testing.T) {
-			number, err := schet.New(tc.number)
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.line+"/"+tt.name, func(t *testing.T) {
+			number, err := schet.New(tt.number)
 
-			linkToToest := fmt.Sprintf("%s:%d", file, tc.line)
-
-			if !errors.Is(err, tc.expectedErr) {
-				t.Errorf("\nexpected: %q\nrecieved: %q\ncase: %s", tc.expectedErr, err, linkToToest)
+			if !errors.Is(err, tt.expectedErr) {
+				t.Errorf("\nexpected: %q\nrecieved: %q\ncase: %s", tt.expectedErr, err, tt.line)
 			}
 
-			if number.Type() != tc.expected {
-				t.Errorf("\nexpected: %q\nrecieved: %q\ncase: %s", tc.expected, number.Type(), linkToToest)
+			if number.Type() != tt.expected {
+				t.Errorf("\nexpected: %q\nrecieved: %q\ncase: %s", tt.expected, number.Type(), tt.line)
 			}
 		})
 	}
 }
 
 func TestAccountCurrency(t *testing.T) {
-	_, file, _, _ := runtime.Caller(0)
-
-	testCases := []struct {
-		line        int
+	tests := []struct {
+		line        string
 		name        string
 		number      string
 		expected    string
@@ -79,83 +74,25 @@ func TestAccountCurrency(t *testing.T) {
 		},
 	}
 
-	for _, tc := range testCases {
-		tc := tc
-		t.Run(tc.name, func(t *testing.T) {
-			number, err := schet.New(tc.number)
-
-			linkToToest := fmt.Sprintf("%s:%d", file, tc.line)
-
-			if !errors.Is(err, tc.expectedErr) {
-				t.Errorf("\nexpected: %q, recieved: %q\ncase: %s", tc.expectedErr, err, linkToToest)
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.line+"/"+tt.name, func(t *testing.T) {
+			number, err := schet.New(tt.number)
+			if !errors.Is(err, tt.expectedErr) {
+				t.Errorf("\nexpected: %q, recieved: %q\ncase: %s", tt.expectedErr, err, tt.line)
 			}
 
-			if number.CurrencyCode != tc.expected {
-				t.Errorf("\nexpected: %q\nrecieved: %q\ncase: %s", tc.expected, number.CurrencyCode, linkToToest)
+			if number.CurrencyCode != tt.expected {
+				t.Errorf("\nexpected: %q\nrecieved: %q\ncase: %s", tt.expected, number.CurrencyCode, tt.line)
 			}
 		})
 	}
 }
 
-func TestAccountTypeCode(t *testing.T) {
-	_, file, _, _ := runtime.Caller(0)
-
-	testCases := []struct {
-		line        int
-		name        string
-		number      string
-		expected    string
-		expectedErr error
-	}{
-		{
-			line:        line(),
-			name:        "Текущий счёт резидента",
-			number:      "40817810455556666666",
-			expected:    "0100",
-			expectedErr: nil,
-		},
-		{
-			line:        line(),
-			name:        "Текущий счёт не резидента",
-			number:      "40820978455556666666",
-			expected:    "0100",
-			expectedErr: nil,
-		},
-		{
-			line:        line(),
-			name:        "Электронный кошелёк, электронные средства платежа (ЭСП) для переводов электронных денежных средств (ЭДС)",
-			number:      "40914978455556666666",
-			expected:    "9902",
-			expectedErr: nil,
-		},
-		{
-			line:        line(),
-			name:        "Неизвестный код для типа 00000",
-			number:      "00000810455556666666",
-			expected:    "",
-			expectedErr: schet.ErrUnknownTypeCode,
-		},
+func line() string {
+	_, file, line, ok := runtime.Caller(1)
+	if ok {
+		return fmt.Sprintf("%s:%d", filepath.Base(file), line)
 	}
-
-	for _, tc := range testCases {
-		tc := tc
-		t.Run(tc.name, func(t *testing.T) {
-			number, err := schet.New(tc.number)
-
-			linkToToest := fmt.Sprintf("%s:%d", file, tc.line)
-
-			if number.TypeCode != tc.expected {
-				t.Errorf("\nexpected: %q\nrecieved: %q\ncase: %s", tc.expected, number.TypeCode, linkToToest)
-			}
-
-			if !errors.Is(err, tc.expectedErr) {
-				t.Errorf("\nexpected: %q\nrecieved: %q\ncase: %s", tc.expectedErr, err, linkToToest)
-			}
-		})
-	}
-}
-
-func line() int {
-	_, _, line, _ := runtime.Caller(1)
-	return line
+	return "It was not possible to recover file and line number information about function invocations!"
 }
